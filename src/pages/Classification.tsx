@@ -14,10 +14,12 @@ import {
   CircularProgress,
   Alert,
   Container,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { fetchCombinedResults, CombinedResult } from "../api/api";
 import chainLeague from '../assets/chain-LEAGUE.png';
+import { useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.MuiTableCell-head`]: {
@@ -90,6 +92,7 @@ const ModernToggleButton = styled(ToggleButton)(({ theme }) => ({
 }));
 
 const Classification: React.FC = () => {
+  const navigate = useNavigate();
   const [results, setResults] = useState<{ [key: string]: CombinedResult[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -240,9 +243,43 @@ const Classification: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ pt: '32px', pb: '32px', px: { xs: 2, sm: 3, md: 4 } }}>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+            <Button
+              variant="contained"
+              onClick={() => navigate("/")}
+              aria-label="Powrot do strony glownej"
+              sx={{
+                minWidth: 44,
+                width: 44,
+                height: 44,
+                padding: 0,
+                borderRadius: '999px',
+                backgroundColor: '#31666a',
+                color: '#fefefe',
+                boxShadow: '0 6px 16px rgba(15, 61, 64, 0.3)',
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#215356',
+                  boxShadow: '0 8px 20px rgba(15, 61, 64, 0.4)',
+                },
+              }}
+            >
+              <Box
+                component="svg"
+                viewBox="0 0 24 24"
+                sx={{ width: 24, height: 24, display: 'block' }}
+                aria-hidden="true"
+              >
+                <path
+                  d="M10.828 12l4.95-4.95a1 1 0 10-1.414-1.414l-5.657 5.657a1 1 0 000 1.414l5.657 5.657a1 1 0 001.414-1.414L10.828 12z"
+                  fill="currentColor"
+                />
+              </Box>
+            </Button>
+          </Box>
       <Box
         component="img"
-        sx={{height: 250, marginTop: 2, marginBottom: 2}}
+        sx={{height: 250}}
         src={chainLeague}
         alt="CRDGC Logo"
         className="mx-auto"
@@ -254,6 +291,7 @@ const Classification: React.FC = () => {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 3,
+            minWidth: '750px',
           }}
         >
           <Typography 
@@ -269,18 +307,6 @@ const Classification: React.FC = () => {
             }}
           >
             Chain Reaction League {getSeasonDisplayName(selectedSeason)}
-          </Typography>
-          <Typography 
-            variant="h6" 
-            gutterBottom 
-            sx={{
-              fontFamily: 'Jost, sans-serif',
-              color: '#31666a',
-              fontWeight: 500,
-              fontSize: { xs: '1rem', sm: '1.25rem' },
-            }}
-          >
-            Klasyfikacja generalna
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', alignItems: 'center' }}>
             <ToggleButtonGroup
