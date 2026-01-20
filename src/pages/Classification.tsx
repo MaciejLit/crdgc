@@ -321,6 +321,8 @@ const Classification: React.FC = () => {
                 },
               }}
             >
+              <ModernToggleButton value="vol1">Vol. 1</ModernToggleButton>
+              <ModernToggleButton value="vol2">Vol. 2</ModernToggleButton>
               <ModernToggleButton value="vol3">Vol. 3</ModernToggleButton>
               <ModernToggleButton value="vol4">Vol. 4</ModernToggleButton>
             </ToggleButtonGroup>
