@@ -1,68 +1,5 @@
-import { Box, Button, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { styled } from "@mui/material/styles";
-import crdgcLogo from '../assets/crdgcLogo.png';
-
-const GlassCard = styled(Box)(({ theme }) => ({
-  background: 'rgba(222, 240, 239, 0.25)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  borderRadius: '24px',
-  border: '1px solid rgba(193, 216, 207, 0.4)',
-  boxShadow: '0 8px 32px 0 rgba(15, 61, 64, 0.3)',
-  padding: theme.spacing(4),
-  textAlign: 'center',
-  maxWidth: 600,
-  marginBottom: theme.spacing(5),
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  position: 'relative',
-  overflow: 'hidden',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 12px 48px 0 rgba(15, 61, 64, 0.4)',
-    background: 'rgba(222, 240, 239, 0.35)',
-    '&::before': {
-      opacity: 1,
-    },
-  },
-}));
-
-const ModernButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  padding: theme.spacing(1.5, 4),
-  borderRadius: '16px',
-  background: 'linear-gradient(135deg, #def0ef 0%, #c1d8cf 50%, #95b9b8 100%)',
-  color: '#0f3d40',
-  fontWeight: 600,
-  fontSize: '1rem',
-  textTransform: 'none',
-  boxShadow: '0 4px 16px rgba(15, 61, 64, 0.2)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-100%',
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
-    transition: 'left 0.5s ease',
-  },
-  '&:hover': {
-    background: 'linear-gradient(135deg, #fefefe 0%, #def0ef 50%, #c1d8cf 100%)',
-    transform: 'translateY(-2px)',
-    boxShadow: '0 8px 24px rgba(15, 61, 64, 0.3)',
-    color: '#092123',
-    '&::before': {
-      left: '100%',
-    },
-  },
-  '&:active': {
-    transform: 'translateY(0)',
-  },
-}));
+import crdgcLogo from "../assets/crdgcLogo.png";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -75,134 +12,44 @@ const Home: React.FC = () => {
   };
 
   return (
-    <Container 
-      maxWidth="lg" 
-      sx={{ 
-        pt: 0,
-        pb: '16px',
-        px: { xs: 2, sm: 3, md: 4 },
-        minHeight: 'calc(100vh - 300px)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}
-    >
-      <Box
-        component="img"
-        sx={{height: 125, marginTop: 6, marginBottom: 6}}
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-0 pb-4 min-h-[calc(100vh-300px)] flex flex-col justify-center">
+      <img
         src={crdgcLogo}
         alt="CRDGC Logo"
-        className="mx-auto"
+        className="mx-auto h-48 sm:h-32 md:h-48 w-full max-w-[380px] object-contain mt-3 sm:mt-5 md:mt-6 mb-3 sm:mb-5 md:mb-6"
       />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 4,
-        }}
-      >
-        <GlassCard
-          sx={{
-            animation: 'fadeInUp 0.6s ease-out',
-            '@keyframes fadeInUp': {
-              from: {
-                opacity: 0,
-                transform: 'translateY(30px)',
-              },
-              to: {
-                opacity: 1,
-                transform: 'translateY(0)',
-              },
-            },
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            gutterBottom
-            sx={{
-              fontWeight: 700,
-              mb: 2,
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' },
-              background: '#215356',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
+      <div className="flex w-full flex-col md:flex-row items-stretch justify-center gap-3 md:gap-4">
+        <div className="flex-1 w-full md:min-w-[360px] md:max-w-[520px] rounded-3xl border border-[#c1d8cf]/40 bg-[#def0ef]/25 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_8px_32px_rgba(15,61,64,0.3)] transition-all duration-300 hover:-translate-y-2 hover:bg-[#def0ef]/35 hover:shadow-[0_12px_48px_rgba(15,61,64,0.4)]">
+          <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-[#215356]">
             Klasyfikacja generalna
-          </Typography>
-          <Typography 
-            variant="body1" 
-            gutterBottom
-            sx={{
-              color: '#0f3d40',
-              mb: 1,
-              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-              lineHeight: 1.7,
-              maxWidth: '90%',
-              mx: 'auto',
-              fontWeight: 500,
-            }}
-          >
+          </h2>
+          <p className="mx-auto max-w-[90%] text-sm sm:text-base text-[#0f3d40] font-medium leading-relaxed">
             Kliknij poniżej, aby zobaczyć wyniki aktualnej klasyfikacji Chain Reaction League
-          </Typography>
-          <ModernButton onClick={handleClick}>
+          </p>
+          <button
+            onClick={handleClick}
+            className="mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm sm:text-base font-semibold text-[#0f3d40] bg-gradient-to-br from-[#def0ef] via-[#c1d8cf] to-[#95b9b8] shadow-[0_4px_16px_rgba(15,61,64,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,61,64,0.3)]"
+          >
             Zobacz wyniki
-          </ModernButton>
-        </GlassCard>
+          </button>
+        </div>
 
-        <GlassCard
-          sx={{
-            animation: 'fadeInUp 0.8s ease-out',
-            '@keyframes fadeInUp': {
-              from: {
-                opacity: 0,
-                transform: 'translateY(30px)',
-              },
-              to: {
-                opacity: 1,
-                transform: 'translateY(0)',
-              },
-            },
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            gutterBottom
-            sx={{
-              fontWeight: 700,
-              mb: 2,
-              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' },
-              background: '#215356',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
+        <div className="flex-1 w-full md:min-w-[360px] md:max-w-[520px] rounded-3xl border border-[#c1d8cf]/40 bg-[#def0ef]/25 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_8px_32px_rgba(15,61,64,0.3)] transition-all duration-300 hover:-translate-y-2 hover:bg-[#def0ef]/35 hover:shadow-[0_12px_48px_rgba(15,61,64,0.4)]">
+          <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-[#215356]">
             Chain Reaction Disc Golf Club
-          </Typography>
-          <Typography 
-            variant="body1" 
-            gutterBottom
-            sx={{
-              color: '#0f3d40',
-              mb: 1,
-              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-              lineHeight: 1.7,
-              maxWidth: '90%',
-              mx: 'auto',
-              fontWeight: 500,
-            }}
-          >
+          </h2>
+          <p className="mx-auto max-w-[90%] text-sm sm:text-base text-[#0f3d40] font-medium leading-relaxed">
             Kliknij poniżej, aby dowiedzieć się więcej o klubie i jak do nas dołączyć!
-          </Typography>
-          <ModernButton onClick={handleDiscordClick}>
+          </p>
+          <button
+            onClick={handleDiscordClick}
+            className="mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm sm:text-base font-semibold text-[#0f3d40] bg-gradient-to-br from-[#def0ef] via-[#c1d8cf] to-[#95b9b8] shadow-[0_4px_16px_rgba(15,61,64,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,61,64,0.3)] hover:text-[#092123]"
+          >
             Dołącz do CRDGC
-          </ModernButton>
-        </GlassCard>
-      </Box>
-    </Container>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

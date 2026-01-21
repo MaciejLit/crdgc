@@ -1,95 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  ToggleButton,
-  ToggleButtonGroup,
-  CircularProgress,
-  Alert,
-  Container,
-  Button,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { fetchCombinedResults, CombinedResult } from "../api/api";
-import chainLeague from '../assets/chain-LEAGUE.png';
 import { useNavigate } from "react-router-dom";
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.MuiTableCell-head`]: {
-    backgroundColor: '#31666a',
-    color: '#fefefe',
-    fontWeight: 700,
-    fontSize: '0.875rem',
-    letterSpacing: '0.5px',
-    padding: theme.spacing(2),
-    borderBottom: '2px solid rgba(149, 185, 184, 0.3)',
-  },
-  [`&.MuiTableCell-body`]: {
-    fontSize: '0.9rem',
-    padding: theme.spacing(1.5, 2),
-    borderBottom: '1px solid rgba(193, 216, 207, 0.3)',
-    color: '#0f3d40',
-  },
-  "&:last-child, &:first-child, &:nth-child(2)": {
-    fontWeight: 600,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(() => ({
-  transition: 'all 0.2s ease-in-out',
-  "&:nth-of-type(odd)": {
-    backgroundColor: 'rgba(222, 240, 239, 0.3)',
-  },
-  "&:hover": {
-    backgroundColor: 'rgba(193, 216, 207, 0.5)',
-    transform: 'scale(1.01)',
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-}));
-
-const GlassCard = styled(Paper)(() => ({
-  background: 'rgba(254, 254, 254, 0.98)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  borderRadius: '24px',
-  boxShadow: '0 8px 32px 0 rgba(15, 61, 64, 0.2)',
-  overflow: 'hidden',
-}));
-
-const ModernToggleButton = styled(ToggleButton)(({ theme }) => ({
-  borderRadius: '12px',
-  padding: theme.spacing(1, 2.5),
-  fontWeight: 600,
-  textTransform: 'none',
-  fontSize: '0.9rem',
-  border: '2px solid rgba(193, 216, 207, 0.5)',
-  color: '#31666a',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&.Mui-selected': {
-    background: 'linear-gradient(135deg, #4d8686 0%, #31666a 50%, #215356 100%)',
-    color: '#fefefe',
-    border: '2px solid transparent',
-    boxShadow: '0 4px 12px rgba(33, 83, 86, 0.4)',
-    '&:hover': {
-      background: 'linear-gradient(135deg, #31666a 0%, #215356 50%, #0f3d40 100%)',
-    },
-  },
-  '&:hover': {
-    border: '2px solid rgba(77, 134, 134, 0.7)',
-    borderLeft: '2px solid rgba(77, 134, 134, 0.7)',
-    transform: 'translateY(-2px)',
-    backgroundColor: 'rgba(222, 240, 239, 0.3)',
-  },
-}));
+import { fetchCombinedResults, CombinedResult } from "../api/api";
+import chainLeague from "../assets/chain-LEAGUE.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const Classification: React.FC = () => {
   const navigate = useNavigate();
@@ -99,8 +13,6 @@ const Classification: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<string>('vol4');
 
-  // Get indices of the 4 highest rounds (returns array of round numbers: 1-7)
-  // For every player, returns the best 4 rounds (or all rounds if 4 or fewer)
   const getTopFourRoundIndices = (player: CombinedResult): number[] => {
     const rounds = [
       { value: player.points1, index: 1 },
@@ -118,7 +30,6 @@ const Classification: React.FC = () => {
 
     if (rounds.length === 0) return [];
 
-    // Sort by value descending and take top 4 (or all if 4 or fewer)
     const sortedRounds = [...rounds].sort((a, b) => b.value - a.value);
     const roundsToTake = Math.min(4, sortedRounds.length);
     return sortedRounds.slice(0, roundsToTake).map(round => round.index);
@@ -143,40 +54,18 @@ const Classification: React.FC = () => {
     getData();
   }, [selectedSeason]);
 
-  const handleCategoryChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newCategory: string | null
-  ) => {
-    if (newCategory !== null) {
-      setSelectedCategory(newCategory);
-    } else {
-      console.log(event);
-    }
-  };
-
-  const handleSeasonChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newSeason: string | null
-  ) => {
-    if (newSeason !== null) {
-      setSelectedSeason(newSeason);
-    }
-  };
-
   const getSeasonDisplayName = (season: string): string => {
     const seasonNumber = season.replace('vol', '');
     return `vol. ${seasonNumber}`;
   };
 
   const getPlaceBackgroundColor = (place: number): string | undefined => {
-    if (place === 1) return 'rgba(255, 215, 0, 0.5)'; // Gold
-    if (place === 2) return 'rgba(192, 192, 192, 0.5)'; // Silver
-    if (place === 3) return 'rgba(205, 127, 50, 0.5)'; // Bronze
+    if (place === 1) return 'rgba(255, 215, 0, 0.5)';
+    if (place === 2) return 'rgba(192, 192, 192, 0.5)';
+    if (place === 3) return 'rgba(205, 127, 50, 0.5)';
     return undefined;
   };
 
-  // Adjust player order for vol. 3 playoff results
-  // Mateusz Nitka won the playoff and should be 2nd, Filip Górski should be 3rd
   const adjustVol3Results = (categoryResults: CombinedResult[]): CombinedResult[] => {
     if (selectedSeason !== 'vol3') return categoryResults;
 
@@ -185,15 +74,12 @@ const Classification: React.FC = () => {
     
     if (!mateusz || !filip) return categoryResults;
 
-    // Get players who need to be moved down (were in 2nd or 3rd but aren't Mateusz or Filip)
     const playersToMoveDown = categoryResults.filter(
       p => (p.place === 2 || p.place === 3) && p.name !== 'Mateusz Nitka' && p.name !== 'Filip Górski'
     );
 
-    // Sort players to move down by their original place
     const sortedToMoveDown = [...playersToMoveDown].sort((a, b) => a.place - b.place);
-    
-    // Assign new places starting from 4
+
     const placeMapping = new Map<string, number>();
     let nextPlace = 4;
     sortedToMoveDown.forEach(player => {
@@ -216,234 +102,149 @@ const Classification: React.FC = () => {
       return player;
     });
 
-    // Sort by place to ensure correct order
     return adjusted.sort((a, b) => a.place - b.place);
   };
 
+  const cardClass =
+    "w-full rounded-3xl bg-[#fefefe]/95 border border-[#c1d8cf]/40 shadow-[0_8px_32px_rgba(15,61,64,0.2)]";
+  const toggleBase =
+    "rounded-xl border-2 border-[#c1d8cf]/50 text-[#31666a] text-sm font-semibold transition-all bg-transparent";
+  const toggleHover = "hover:border-[#4d8686]/70 hover:bg-[#def0ef]/30";
+  const toggleSelected =
+    "bg-gradient-to-r from-[#4d8686] via-[#31666a] to-[#215356] text-white border-transparent shadow-[0_4px_12px_rgba(33,83,86,0.4)]";
+
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ pt: '32px', pb: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress size={60} sx={{ mb: 2, color: '#215356' }} />
-          <Typography variant="h6" sx={{ color: '#215356', fontWeight: 500 }}>Ładowanie danych...</Typography>
-        </Box>
-      </Container>
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8 min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-3 h-12 w-12 rounded-full border-4 border-[#215356] border-t-transparent animate-spin" />
+          <p className="text-[#215356] font-medium">Ładowanie danych...</p>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ pt: '32px', pb: '32px' }}>
-        <Alert severity="error" sx={{ borderRadius: '16px', fontSize: '1rem' }}>
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8">
+        <div className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-red-700">
           {error}
-        </Alert>
-      </Container>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ pt: '32px', pb: '32px', px: { xs: 2, sm: 3, md: 4 } }}>
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
-            <Button
-              variant="contained"
-              onClick={() => navigate("/")}
-              aria-label="Powrot do strony glownej"
-              sx={{
-                minWidth: 44,
-                width: 44,
-                height: 44,
-                padding: 0,
-                borderRadius: '999px',
-                backgroundColor: '#31666a',
-                color: '#fefefe',
-                boxShadow: '0 6px 16px rgba(15, 61, 64, 0.3)',
-                textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: '#215356',
-                  boxShadow: '0 8px 20px rgba(15, 61, 64, 0.4)',
-                },
-              }}
-            >
-              <Box
-                component="svg"
-                viewBox="0 0 24 24"
-                sx={{ width: 24, height: 24, display: 'block' }}
-                aria-hidden="true"
-              >
-                <path
-                  d="M10.828 12l4.95-4.95a1 1 0 10-1.414-1.414l-5.657 5.657a1 1 0 000 1.414l5.657 5.657a1 1 0 001.414-1.414L10.828 12z"
-                  fill="currentColor"
-                />
-              </Box>
-            </Button>
-          </Box>
-      <Box
-        component="img"
-        sx={{height: 250}}
-        src={chainLeague}
-        alt="CRDGC Logo"
-        className="mx-auto"
-      />
-      <GlassCard sx={{ mb: 4, p: { xs: 3, sm: 4, md: 5 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 3,
-            minWidth: '750px',
-          }}
+    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8">
+      <div className="w-full grid grid-cols-[44px_1fr_44px] items-center gap-2 mb-4">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          aria-label="Powrot do strony glownej"
+          className="h-11 w-11 rounded-full bg-[#31666a] text-[#fefefe] shadow-[0_6px_16px_rgba(15,61,64,0.3)] flex items-center justify-center hover:bg-[#215356] transition text-xl"
         >
-          <Typography 
-            variant="h4" 
-            gutterBottom 
-            sx={{
-              fontFamily: 'Jost, sans-serif',
-              fontWeight: 700,
-              background: '#215356',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' },
-            }}
-          >
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+        <img
+          src={chainLeague}
+          alt="CRDGC Logo"
+          className="h-36 sm:h-44 md:h-56 w-full max-w-[500px] object-contain mx-auto"
+        />
+        <div aria-hidden="true" />
+      </div>
+
+      <div className={`${cardClass} mx-auto max-w-[900px] p-4 sm:p-6 mb-4`}>
+        <div className="flex flex-col items-center gap-3">
+          <h1 className="text-transparent bg-clip-text bg-[#215356] text-2xl sm:text-3xl md:text-4xl font-bold">
             Chain Reaction League {getSeasonDisplayName(selectedSeason)}
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%', alignItems: 'center' }}>
-            <ToggleButtonGroup
-              value={selectedSeason}
-              exclusive
-              onChange={handleSeasonChange}
-              sx={{ 
-                mb: 1,
-                gap: 0,
-                '& .MuiToggleButton-root': {
-                  margin: 0,
-                },
-              }}
-            >
-              <ModernToggleButton value="vol1">Vol. 1</ModernToggleButton>
-              <ModernToggleButton value="vol2">Vol. 2</ModernToggleButton>
-              <ModernToggleButton value="vol3">Vol. 3</ModernToggleButton>
-              <ModernToggleButton value="vol4">Vol. 4</ModernToggleButton>
-            </ToggleButtonGroup>
-            <ToggleButtonGroup
-              value={selectedCategory}
-              exclusive
-              onChange={handleCategoryChange}
-              sx={{
-                flexWrap: 'wrap',
-                gap: 0,
-                justifyContent: 'center',
-                '& .MuiToggleButton-root': {
-                  margin: 0,
-                },
-              }}
-            >
+          </h1>
+          <div className="flex flex-col gap-2 w-full items-center">
+            <div className="flex flex-wrap justify-center w-full gap-2">
+              {["vol1", "vol2", "vol3", "vol4"].map((season) => (
+                <button
+                  key={season}
+                  type="button"
+                  onClick={() => setSelectedSeason(season)}
+                  className={`${toggleBase} ${toggleHover} ${
+                    selectedSeason === season ? toggleSelected : ""
+                  } flex-1 sm:flex-none min-w-[110px] px-3 py-2 text-center`}
+                >
+                  {season.replace("vol", "Vol. ")}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center w-full gap-2">
               {results &&
                 Object.keys(results).map((category) => (
-                  <ModernToggleButton key={category} value={category}>
-                    {category}
-                  </ModernToggleButton>
-                ))}
-            </ToggleButtonGroup>
-          </Box>
-        </Box>
-      </GlassCard>
-
-      <GlassCard>
-        <TableContainer sx={{ borderRadius: '24px', overflow: 'hidden' }}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Miejsce</StyledTableCell>
-              <StyledTableCell>Gracz</StyledTableCell>
-              <StyledTableCell align='center'>#1</StyledTableCell>
-              <StyledTableCell align='center'>#2</StyledTableCell>
-              <StyledTableCell align='center'>#3</StyledTableCell>
-              <StyledTableCell align='center'>#4</StyledTableCell>
-              <StyledTableCell align='center'>#5</StyledTableCell>
-              <StyledTableCell align='center'>#6</StyledTableCell>
-              {selectedSeason === 'vol4' && (
-                <StyledTableCell align='center'>#7</StyledTableCell>
-              )}
-              <StyledTableCell align='center'>Suma</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {results &&
-              selectedCategory &&
-              adjustVol3Results(results[selectedCategory] || []).map((player) => {
-                const topFourIndices = getTopFourRoundIndices(player);
-                const isTopFour = (roundNum: number) => topFourIndices.includes(roundNum);
-                const placeBgColor = getPlaceBackgroundColor(player.place);
-                
-                return (
-                  <StyledTableRow 
-                    key={player.name}
-                    sx={{
-                      ...(placeBgColor && {
-                        backgroundColor: placeBgColor,
-                        '&:nth-of-type(odd)': {
-                          backgroundColor: placeBgColor,
-                        },
-                      }),
-                    }}
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setSelectedCategory(category)}
+                    className={`${toggleBase} ${toggleHover} ${
+                      selectedCategory === category ? toggleSelected : ""
+                    } flex-1 sm:flex-none min-w-[140px] px-3 py-2 text-center`}
                   >
-                    <StyledTableCell align='center'>{player.place}</StyledTableCell>
-                    <StyledTableCell>{player.name}</StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(1) ? 600 : 'normal' }}
+                    {category}
+                  </button>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`${cardClass} overflow-hidden`}>
+        <div className="overflow-x-auto">
+          <table className="min-w-[360px] sm:min-w-[640px] md:min-w-[700px] w-full text-[11px] sm:text-sm">
+            <thead>
+              <tr>
+                <th className="bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3">Miejsce</th>
+                <th className="bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3">Gracz</th>
+                <th className="bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#1</th>
+                <th className="bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#2</th>
+                <th className="hidden sm:table-cell bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#3</th>
+                <th className="hidden sm:table-cell bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#4</th>
+                <th className="hidden sm:table-cell bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#5</th>
+                <th className="hidden sm:table-cell bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#6</th>
+                {selectedSeason === "vol4" && (
+                  <th className="hidden sm:table-cell bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">#7</th>
+                )}
+                <th className="bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3 text-center">Suma</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results &&
+                selectedCategory &&
+                adjustVol3Results(results[selectedCategory] || []).map((player, index) => {
+                  const topFourIndices = getTopFourRoundIndices(player);
+                  const isTopFour = (roundNum: number) => topFourIndices.includes(roundNum);
+                  const placeBgColor = getPlaceBackgroundColor(player.place);
+                  const rowClass = placeBgColor ? "" : index % 2 === 1 ? "bg-[#def0ef]/30" : "";
+                  return (
+                    <tr
+                      key={player.name}
+                      className={`${rowClass} hover:bg-[#c1d8cf]/50 transition`}
+                      style={placeBgColor ? { backgroundColor: placeBgColor } : undefined}
                     >
-                      {player.points1 ?? "-"}
-                    </StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(2) ? 600 : 'normal' }}
-                    >
-                      {player.points2 ?? "-"}
-                    </StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(3) ? 600 : 'normal' }}
-                    >
-                      {player.points3 ?? "-"}
-                    </StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(4) ? 600 : 'normal' }}
-                    >
-                      {player.points4 ?? "-"}
-                    </StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(5) ? 600 : 'normal' }}
-                    >
-                      {player.points5 ?? "-"}
-                    </StyledTableCell>
-                    <StyledTableCell 
-                      align='center'
-                      sx={{ fontWeight: isTopFour(6) ? 600 : 'normal' }}
-                    >
-                      {player.points6 ?? "-"}
-                    </StyledTableCell>
-                    {selectedSeason === 'vol4' && (
-                      <StyledTableCell 
-                        align='center'
-                        sx={{ fontWeight: isTopFour(7) ? 600 : 'normal' }}
-                      >
-                        {player.points7 ?? "-"}
-                      </StyledTableCell>
-                    )}
-                    <StyledTableCell align='center'>{player.totalPoints}</StyledTableCell>
-                  </StyledTableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      </GlassCard>
-    </Container>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#0f3d40]">{player.place}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-[#0f3d40]">{player.name}</td>
+                      <td className={`px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(1) ? "font-semibold" : "font-normal"}`}>{player.points1 ?? "-"}</td>
+                      <td className={`px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(2) ? "font-semibold" : "font-normal"}`}>{player.points2 ?? "-"}</td>
+                      <td className={`hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(3) ? "font-semibold" : "font-normal"}`}>{player.points3 ?? "-"}</td>
+                      <td className={`hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(4) ? "font-semibold" : "font-normal"}`}>{player.points4 ?? "-"}</td>
+                      <td className={`hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(5) ? "font-semibold" : "font-normal"}`}>{player.points5 ?? "-"}</td>
+                      <td className={`hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(6) ? "font-semibold" : "font-normal"}`}>{player.points6 ?? "-"}</td>
+                      {selectedSeason === "vol4" && (
+                        <td className={`hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-center text-[#0f3d40] ${isTopFour(7) ? "font-semibold" : "font-normal"}`}>{player.points7 ?? "-"}</td>
+                      )}
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-center font-semibold text-[#0f3d40]">{player.totalPoints}</td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 };
 

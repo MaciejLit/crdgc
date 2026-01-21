@@ -1,42 +1,35 @@
 import { Link, useLocation } from "react-router-dom";
-import crdgcLogo from '../assets/crdgcLogo.png';
-import chainLeague from '../assets/chain-LEAGUE.png';
-import { Box } from "@mui/material";
+import crdgcLogo from "../assets/crdgcLogo.png";
+import chainLeague from "../assets/chain-LEAGUE.png";
 
 const Header: React.FC = () => {
   const location = useLocation();
-  const logoToDisplay = location.pathname === '/classification' ? chainLeague : crdgcLogo;
-  const classDependsOfLogo = location.pathname === '/classification' ? {height: 250, marginTop: 8} : {height: 250, marginTop: 14, marginBottom: 6};
+  const logoToDisplay = location.pathname === "/classification" ? chainLeague : crdgcLogo;
+  const logoClass =
+    location.pathname === "/classification"
+      ? "h-40 sm:h-52 md:h-64 mt-2 sm:mt-4 md:mt-8"
+      : "h-40 sm:h-52 md:h-64 mt-4 sm:mt-8 md:mt-14 mb-4 sm:mb-5 md:mb-6";
+
   return (
     <header className="relative w-full">
-      <nav className="fixed top-0 left-0 w-full border-b-2 flex justify-center gap-8 p-2 text-white font-poppins font-normal text-lg z-50 backdrop-blur-md backdrop-brightness-75 items-center">
-        <Link 
-          to="/" 
-          className="px-4 py-2 rounded text-white hover:underline hover:text-white hover:bg-black hover:bg-opacity-75 transition-colors duration-300"
+      <nav className="fixed top-0 left-0 z-50 w-full flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 text-[#fefefe] border-b border-[#c1d8cf]/30 bg-[#0f3d40]/25 backdrop-blur">
+        <Link
+          to="/"
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm sm:text-base border border-transparent hover:border-[#c1d8cf]/40 hover:bg-[#c1d8cf]/20 transition-colors"
         >
-          <Box
-            component="img"
-            sx={{
-              height: 40,
-            }}
-            src={crdgcLogo}
-            alt="CRDGC Logo"
-            className="mx-auto"
-          /> 
+          <img src={crdgcLogo} alt="CRDGC Logo" className="h-9 sm:h-11" />
         </Link>
-        <Link 
-          to="/classification" 
-          className="px-4 py-2 rounded text-white hover:underline hover:text-white hover:bg-black hover:bg-opacity-75 transition-colors duration-300"
+        <Link
+          to="/classification"
+          className="rounded-lg px-3 py-2 text-sm sm:text-base border border-transparent hover:border-[#c1d8cf]/40 hover:bg-[#c1d8cf]/20 transition-colors"
         >
           Tabela wyników
         </Link>
       </nav>
-      <Box
-        component="img"
-        sx={classDependsOfLogo}
+      <img
         src={logoToDisplay}
         alt="CRDGC Logo"
-        className="mx-auto"
+        className={`mx-auto w-full max-w-[500px] object-contain ${logoClass}`}
       />
     </header>
   );
