@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Classification from "./pages/Classification";
+import BagTags from "./pages/BagTags";
 
 const App: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/classification" element={<Classification />} />
+            <Route path="/bagtags" element={<BagTags />} />
           </Routes>
         </main>
       </div>
