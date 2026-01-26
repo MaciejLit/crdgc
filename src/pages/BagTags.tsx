@@ -120,7 +120,7 @@ const BagTags: React.FC = () => {
                     {index + 1}. {entry.name}
                   </span>
                   <span className="text-[#31666a] font-medium">
-                    Miejsce: {entry.place ?? "-"} {entry.totalScore !== null ? `• Suma: ${entry.totalScore}` : ""}
+                    {entry.totalScore !== null ? `Suma rzutów: ${entry.totalScore}` : ""}
                   </span>
                 </li>
               ))}
