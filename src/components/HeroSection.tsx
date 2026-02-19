@@ -1,10 +1,4 @@
-interface HeroSectionProps {
-  backgroundImage: string;
-  title: string;
-  subtitle: string;
-  ctaText: string;
-  onCtaClick: () => void;
-}
+import { HeroSectionProps } from "../api/types";
 
 const HeroSection: React.FC<HeroSectionProps> = ({
   backgroundImage,

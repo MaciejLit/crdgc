@@ -1,8 +1,4 @@
-interface RouteCardProps {
-  title: string;
-  image: string;
-  holes: number;
-}
+import { RouteCardProps } from "../api/types";
 
 const RouteCard: React.FC<RouteCardProps> = ({ title, image, holes }) => {
   return (

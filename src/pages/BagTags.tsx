@@ -1,16 +1,5 @@
 import { useState } from "react";
-
-type MemberResult = {
-  name: string;
-  place: number | null;
-  totalScore: number | null;
-};
-
-type BagTagsResponse = {
-  members?: MemberResult[];
-  results?: MemberResult[];
-  missingMembers?: string[];
-};
+import { BagTagsResponse, MemberResult } from "../api/types";
 
 const API_BASE_URL =
   import.meta.env.REACT_APP_API_URL ||
