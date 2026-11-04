@@ -1,73 +1,134 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { IconType } from "react-icons";
+import { LuAward, LuCalendar, LuChartLine, LuChevronRight, LuCirclePlus, LuCircleUser, LuMapPin } from "react-icons/lu";
+import { FaDiscord, FaInstagram, FaSquareFacebook } from "react-icons/fa6";
 import crdgcLogo from "../assets/crdgcLogo.png";
 
-const Home: React.FC = () => {
-  const navigate = useNavigate();
-  const handleClick = () => {
-    navigate("/classification");
-  };
+const DISCORD_URL = "https://discord.gg/93CDnK8T3A";
 
-  const handleBagTagsClick = () => {
-    navigate("/bagtags");
-  };
+interface NavItem {
+  title: string;
+  description: string;
+  icon: IconType;
+  to?: string;
+  href?: string;
+}
 
-  const handleDiscordClick = () => {
-    window.open("https://discord.gg/93CDnK8T3A", "_blank", "noopener,noreferrer");
-  };
+const NAV_ITEMS: NavItem[] = [
+  {
+    title: "CRDGC BagTag's",
+    description: "Sprawdź ranking BagTagów na podstawie wyników turnieju DiscGolfMetrix.",
+    icon: LuAward,
+    to: "/bagtags",
+  },
+  {
+    title: "Klasyfikacja generalna",
+    description: "Zobacz wyniki klasyfikacji generalnej zimowej Chain Reaction League.",
+    icon: LuChartLine,
+    to: "/classification",
+  },
+  {
+    title: "Nasz zespół",
+    description: "Poznaj strukturę i team Chain Reaction Club.",
+    icon: LuCircleUser,
+    to: "/team",
+  },
+  {
+    title: "Nasze pola",
+    description: "Sprawdź, gdzie możesz zagrać i nas spotkać.",
+    icon: LuMapPin,
+    to: "/courses",
+  },
+  {
+    title: "Nasze turnieje",
+    description: "Zobacz turnieje organizowane przez Chain Reaction Disc Golf Club.",
+    icon: LuCalendar,
+    to: "/tournaments",
+  },
+  {
+    title: "Dołącz do nas!",
+    description: "Wejdź na naszego Discorda i dołącz do klubu.",
+    icon: LuCirclePlus,
+    href: DISCORD_URL,
+  },
+];
 
-  return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 pt-0 pb-4 min-h-[calc(100vh-300px)] flex flex-col justify-center">
-      <img
-        src={crdgcLogo}
-        alt="CRDGC Logo"
-        className="mx-auto h-48 sm:h-32 md:h-48 w-full max-w-[380px] object-contain mt-3 sm:mt-5 md:mt-6 mb-3 sm:mb-5 md:mb-6"
-      />
-      <div className="grid w-full grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-        <div className="w-full rounded-3xl border border-[#c1d8cf]/40 bg-[#def0ef]/25 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_8px_32px_rgba(15,61,64,0.3)] transition-all duration-300 hover:-translate-y-2 hover:bg-[#def0ef]/35 hover:shadow-[0_12px_48px_rgba(15,61,64,0.4)]">
-          <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-[#215356]">
-            Klasyfikacja generalna
-          </h2>
-          <p className="mx-auto max-w-[90%] text-sm sm:text-base text-[#0f3d40] font-medium leading-relaxed">
-            Kliknij poniżej, aby zobaczyć wyniki aktualnej klasyfikacji Chain Reaction League
-          </p>
-          <button
-            onClick={handleClick}
-            className="mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm sm:text-base font-semibold text-[#0f3d40] bg-gradient-to-br from-[#def0ef] via-[#c1d8cf] to-[#95b9b8] shadow-[0_4px_16px_rgba(15,61,64,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,61,64,0.3)]"
-          >
-            Zobacz wyniki
-          </button>
+const SOCIAL_LINKS: { label: string; icon: IconType; href: string }[] = [
+  { label: "Discord", icon: FaDiscord, href: DISCORD_URL },
+  { label: "Facebook", icon: FaSquareFacebook, href: "https://www.facebook.com/chainreactiondgc/" },
+  { label: "Instagram", icon: FaInstagram, href: "https://www.instagram.com/chainreactiondiscgolfclub/" },
+];
+
+const CARD_CLASS =
+  "group h-full flex items-center gap-3 rounded-xl border border-white/60 bg-gradient-to-br from-brand-sky to-[#b9dcd8] px-4 py-4 sm:px-5 sm:py-5 text-left text-brand-ink shadow-[0_6px_20px_rgba(15,37,36,0.25)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(15,37,36,0.35)]";
+
+const NavCard: React.FC<{ item: NavItem }> = ({ item }) => {
+  const Icon = item.icon;
+  const content = (
+    <>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2.5 mb-1.5">
+          <Icon className="shrink-0 text-xl" />
+          <h2 className="text-sm sm:text-base font-semibold">{item.title}</h2>
         </div>
-
-        <div className="w-full rounded-3xl border border-[#c1d8cf]/40 bg-[#def0ef]/25 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_8px_32px_rgba(15,61,64,0.3)] transition-all duration-300 hover:-translate-y-2 hover:bg-[#def0ef]/35 hover:shadow-[0_12px_48px_rgba(15,61,64,0.4)]">
-          <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-[#215356]">
-            Chain Reaction Disc Golf Club
-          </h2>
-          <p className="mx-auto max-w-[90%] text-sm sm:text-base text-[#0f3d40] font-medium leading-relaxed">
-            Kliknij poniżej, aby dowiedzieć się więcej o klubie i jak do nas dołączyć!
-          </p>
-          <button
-            onClick={handleDiscordClick}
-            className="mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm sm:text-base font-semibold text-[#0f3d40] bg-gradient-to-br from-[#def0ef] via-[#c1d8cf] to-[#95b9b8] shadow-[0_4px_16px_rgba(15,61,64,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,61,64,0.3)] hover:text-[#092123]"
-          >
-            Dołącz do CRDGC
-          </button>
-        </div>
-
-        <div className="w-full rounded-3xl border border-[#c1d8cf]/40 bg-[#def0ef]/25 backdrop-blur-xl p-4 sm:p-6 text-center shadow-[0_8px_32px_rgba(15,61,64,0.3)] transition-all duration-300 hover:-translate-y-2 hover:bg-[#def0ef]/35 hover:shadow-[0_12px_48px_rgba(15,61,64,0.4)]">
-          <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-[#215356]">
-            CRDGC BagTag's
-          </h2>
-          <p className="mx-auto max-w-[90%] text-sm sm:text-base text-[#0f3d40] font-medium leading-relaxed">
-            Sprawdź ranking BagTagów na podstawie wyników turnieju DiscGolfMetrix.
-          </p>
-          <button
-            onClick={handleBagTagsClick}
-            className="mt-4 inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm sm:text-base font-semibold text-[#0f3d40] bg-gradient-to-br from-[#def0ef] via-[#c1d8cf] to-[#95b9b8] shadow-[0_4px_16px_rgba(15,61,64,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(15,61,64,0.3)] hover:text-[#092123]"
-          >
-            Otwórz BagTagi
-          </button>
-        </div>
+        <p className="text-xs sm:text-[13px] leading-snug text-brand-ink/80">{item.description}</p>
       </div>
+      <LuChevronRight className="shrink-0 text-xl transition-transform group-hover:translate-x-1" />
+    </>
+  );
+
+  if (item.href) {
+    return (
+      <a href={item.href} target="_blank" rel="noopener noreferrer" className={CARD_CLASS}>
+        {content}
+      </a>
+    );
+  }
+  return (
+    <Link to={item.to ?? "/"} className={CARD_CLASS}>
+      {content}
+    </Link>
+  );
+};
+
+const Home: React.FC = () => {
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-8 sm:py-12 flex flex-col items-center text-white">
+      {/* Przycinamy dolny napis z logo - na ciemnym tle jest nieczytelny */}
+      <div className="w-44 sm:w-52 md:w-60 aspect-[469/330] overflow-hidden drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+        <img src={crdgcLogo} alt="Chain Reaction Disc Golf Club" className="w-full" />
+      </div>
+
+      <h1 className="mt-6 text-center text-xl sm:text-3xl md:text-4xl font-bold">
+        Chain Reaction Disc Golf Club
+      </h1>
+      <p className="mt-2 text-sm sm:text-base text-white/90">Poznań</p>
+      <p className="text-xs sm:text-sm tracking-wide text-white/80">~EST. 2022~</p>
+      <div className="mt-6 mb-8 h-px w-40 bg-white/40" />
+
+      <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        {NAV_ITEMS.map((item) => (
+          <NavCard key={item.title} item={item} />
+        ))}
+      </div>
+
+      <footer className="mt-12 flex flex-col items-center">
+        <p className="text-lg sm:text-xl font-semibold">Znajdź nas na:</p>
+        <div className="mt-4 flex items-center gap-6">
+          {SOCIAL_LINKS.map(({ label, icon: Icon, href }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="text-3xl text-white transition-transform hover:scale-110"
+            >
+              <Icon />
+            </a>
+          ))}
+        </div>
+      </footer>
     </div>
   );
 };

@@ -1,56 +1,56 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fetchCombinedResults, CombinedResult } from "../api/api";
-import chainLeague from "../assets/chain-LEAGUE.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import PageShell from "../components/PageShell";
+import SeasonSelect from "../components/SeasonSelect";
 
-const SEASONS = ["vol1", "vol2", "vol3", "vol4"] as const;
-const BEST_ROUNDS_VOL4 = 5;
-const BEST_ROUNDS_DEFAULT = 4;
-
-const PLACE_COLORS: Record<number, string> = {
-  1: "rgba(255, 215, 0, 0.5)",
-  2: "rgba(192, 192, 192, 0.5)",
-  3: "rgba(205, 127, 50, 0.5)",
-};
-
-const CARD_CLASS =
-  "w-full rounded-3xl bg-[#fefefe]/95 border border-[#c1d8cf]/40 shadow-[0_8px_32px_rgba(15,61,64,0.2)]";
-const TOGGLE_BASE =
-  "rounded-xl border-2 border-[#c1d8cf]/50 text-[#31666a] text-sm font-semibold transition-all bg-transparent";
-const TOGGLE_HOVER = "hover:border-[#4d8686]/70 hover:bg-[#def0ef]/30";
-const TOGGLE_SELECTED =
-  "bg-gradient-to-r from-[#4d8686] via-[#31666a] to-[#215356] text-white border-transparent shadow-[0_4px_12px_rgba(33,83,86,0.4)]";
-const TH_CLASS =
-  "bg-[#31666a] text-[#fefefe] font-semibold tracking-wide px-2 sm:px-4 py-2 sm:py-3";
-const TD_CLASS = "px-2 sm:px-4 py-2 sm:py-3 text-[#0f3d40]";
-const TD_CENTER = "text-center";
-
-function getRoundEntries(player: CombinedResult, season: string): { value: number; index: number }[] {
-  const base = [
-    { value: player.points1, index: 1 },
-    { value: player.points2, index: 2 },
-    { value: player.points3, index: 3 },
-    { value: player.points4, index: 4 },
-    { value: player.points5, index: 5 },
-    { value: player.points6, index: 6 },
-  ];
-  const withVol4 =
-    season === "vol4" && player.points7 != null
-      ? [...base, { value: player.points7!, index: 7 }]
-      : base;
-  return withVol4.filter(
-    (r): r is { value: number; index: number } => r.value != null
-  );
+interface Season {
+  id: string;
+  label: string;
+  rounds: number;
+  bestRounds: number;
 }
 
-function getBestRoundIndices(player: CombinedResult, season: string): number[] {
-  const rounds = getRoundEntries(player, season);
-  if (rounds.length === 0) return [];
-  const count = season === "vol4" ? BEST_ROUNDS_VOL4 : BEST_ROUNDS_DEFAULT;
-  const sorted = [...rounds].sort((a, b) => b.value - a.value);
-  return sorted.slice(0, Math.min(count, sorted.length)).map((r) => r.index);
+const SEASONS: Season[] = [
+  { id: "vol5", label: "2026/2027", rounds: 7, bestRounds: 5 },
+  { id: "vol4", label: "2025/2026", rounds: 7, bestRounds: 5 },
+  { id: "vol3", label: "2024/2025", rounds: 6, bestRounds: 4 },
+  { id: "vol2", label: "2023/2024", rounds: 6, bestRounds: 4 },
+  { id: "vol1", label: "2022/2023", rounds: 6, bestRounds: 4 },
+];
+
+// Krótkie nazwy kategorii do zakładek; pełna nazwa jest w nagłówku sekcji
+const CATEGORY_SHORT: Record<string, string> = {
+  "Women's Pro Open": "FPO",
+  "Pro Master 40+": "MP40",
+  "Mixed Amateur 3": "MA3",
+  "Mixed Amateur 4": "MA4",
+};
+
+function shortCategoryName(name: string): string {
+  return CATEGORY_SHORT[name] ?? name.match(/\bRA[A-Z]\b/)?.[0] ?? name;
+}
+
+function getRoundPoints(player: CombinedResult, rounds: number): (number | null)[] {
+  const all = [
+    player.points1,
+    player.points2,
+    player.points3,
+    player.points4,
+    player.points5,
+    player.points6,
+    player.points7 ?? null,
+  ];
+  return all.slice(0, rounds);
+}
+
+function getBestRoundIndices(points: (number | null)[], count: number): Set<number> {
+  const best = points
+    .map((value, index) => ({ value, index }))
+    .filter((r): r is { value: number; index: number } => r.value != null)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, count)
+    .map((r) => r.index);
+  return new Set(best);
 }
 
 function sortByTotalPoints(players: CombinedResult[]): CombinedResult[] {
@@ -58,15 +58,20 @@ function sortByTotalPoints(players: CombinedResult[]): CombinedResult[] {
   return sorted.map((p, i) => ({ ...p, place: i + 1 }));
 }
 
+const CARD_CLASS = "rounded-2xl bg-brand-cream shadow-[0_8px_24px_rgba(15,37,36,0.25)]";
+const TH_CLASS = "px-4 py-3 text-left text-xs font-medium text-brand-ink whitespace-nowrap";
+const TD_CLASS = "px-4 py-3 text-xs sm:text-sm text-brand-ink whitespace-nowrap";
+
 const Classification: React.FC = () => {
-  const navigate = useNavigate();
-  const [results, setResults] = useState<{
-    [key: string]: CombinedResult[];
-  } | null>(null);
+  const [results, setResults] = useState<{ [key: string]: CombinedResult[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSeason, setSelectedSeason] = useState<string>("vol4");
+  const [selectedSeason, setSelectedSeason] = useState<string>(SEASONS[0].id);
+  const [overflowing, setOverflowing] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const season = SEASONS.find((s) => s.id === selectedSeason) ?? SEASONS[0];
 
   useEffect(() => {
     let cancelled = false;
@@ -74,13 +79,15 @@ const Classification: React.FC = () => {
     setError(null);
     fetchCombinedResults(selectedSeason)
       .then((data) => {
-        if (!cancelled) {
-          setResults(data);
-          setSelectedCategory(Object.keys(data)[0] ?? null);
-        }
+        if (cancelled) return;
+        setResults(data);
+        // Zostajemy w tej samej kategorii przy zmianie sezonu, jeśli istnieje
+        setSelectedCategory((prev) =>
+          prev && prev in data ? prev : Object.keys(data)[0] ?? null
+        );
       })
       .catch((err) => {
-        if (!cancelled) setError("Failed to load data");
+        if (!cancelled) setError("Nie udało się pobrać wyników.");
         console.error(err);
       })
       .finally(() => {
@@ -91,165 +98,115 @@ const Classification: React.FC = () => {
     };
   }, [selectedSeason]);
 
-  const seasonLabel = `vol. ${selectedSeason.replace("vol", "")}`;
   const categoryPlayers =
-    results && selectedCategory
-      ? sortByTotalPoints(results[selectedCategory] ?? [])
-      : [];
+    results && selectedCategory ? sortByTotalPoints(results[selectedCategory] ?? []) : [];
 
-  if (loading) {
-    return (
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8 min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-3 h-12 w-12 rounded-full border-4 border-[#215356] border-t-transparent animate-spin" />
-          <p className="text-[#215356] font-medium">Ładowanie danych...</p>
-        </div>
+  // Podpowiedź o przewijaniu pokazujemy tylko, gdy tabela faktycznie się nie mieści
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => setOverflowing(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [categoryPlayers.length, season.rounds, loading]);
+
+  const tabs = results
+    ? Object.keys(results).map((category) => ({ id: category, label: shortCategoryName(category) }))
+    : [];
+
+  return (
+    <PageShell
+      title="Liga Zimowa"
+      tabs={tabs}
+      activeTab={selectedCategory}
+      onTabChange={setSelectedCategory}
+    >
+      <h2 className="mb-6 text-center text-xl sm:text-2xl font-semibold text-white drop-shadow">
+        {selectedCategory ?? "Chain Reaction League"}
+      </h2>
+
+      <div className={`${CARD_CLASS} p-4 sm:p-5 mb-6 sm:max-w-sm sm:mx-auto`}>
+        <SeasonSelect
+          label="Sezon"
+          value={selectedSeason}
+          options={SEASONS.map((s) => ({ value: s.id, label: s.label }))}
+          onChange={setSelectedSeason}
+        />
       </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8">
+      {error ? (
         <div className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-red-700">
           {error}
         </div>
-      </div>
-    );
-  }
-
-  const toggleClass = (active: boolean) =>
-    `${TOGGLE_BASE} ${TOGGLE_HOVER} ${active ? TOGGLE_SELECTED : ""} flex-1 sm:flex-none min-w-[110px] px-3 py-2 text-center`;
-  const categoryToggleClass = (active: boolean) =>
-    `${TOGGLE_BASE} ${TOGGLE_HOVER} ${active ? TOGGLE_SELECTED : ""} flex-1 sm:flex-none min-w-[140px] px-3 py-2 text-center`;
-
-  return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 pt-8 pb-8">
-      <div className="w-full grid grid-cols-[44px_1fr_44px] items-center gap-2 mb-4">
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          aria-label="Powrot do strony glownej"
-          className="h-11 w-11 rounded-full bg-[#31666a] text-[#fefefe] shadow-[0_6px_16px_rgba(15,61,64,0.3)] flex items-center justify-center hover:bg-[#215356] transition text-xl"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </button>
-        <img
-          src={chainLeague}
-          alt="CRDGC Logo"
-          className="h-36 sm:h-44 md:h-56 w-full max-w-[500px] object-contain mx-auto"
-        />
-        <div aria-hidden="true" />
-      </div>
-
-      <div className={`${CARD_CLASS} mx-auto max-w-[900px] p-4 sm:p-6 mb-4`}>
-        <div className="flex flex-col items-center gap-3">
-          <h1 className="text-transparent bg-clip-text bg-[#215356] text-2xl sm:text-3xl md:text-4xl font-bold">
-            Chain Reaction League {seasonLabel}
-          </h1>
-          <div className="flex flex-col gap-2 w-full items-center">
-            <div className="flex flex-wrap justify-center w-full gap-2">
-              {SEASONS.map((season) => (
-                <button
-                  key={season}
-                  type="button"
-                  onClick={() => setSelectedSeason(season)}
-                  className={toggleClass(selectedSeason === season)}
-                >
-                  {season.replace("vol", "Vol. ")}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-wrap justify-center w-full gap-2">
-              {results &&
-                Object.keys(results).map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => setSelectedCategory(category)}
-                    className={categoryToggleClass(selectedCategory === category)}
-                  >
-                    {category}
-                  </button>
-                ))}
-            </div>
+      ) : (
+        <>
+          <div className={`${CARD_CLASS} overflow-hidden`}>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="mb-3 h-10 w-10 rounded-full border-4 border-brand-green border-t-transparent animate-spin" />
+                <p className="text-sm text-brand-ink">Ładowanie danych...</p>
+              </div>
+            ) : categoryPlayers.length === 0 ? (
+              <p className="px-4 py-10 text-center text-sm text-brand-ink">
+                Brak wyników w tej kategorii.
+              </p>
+            ) : (
+              <div ref={scrollRef} className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-brand-line">
+                      <th className={`${TH_CLASS} sticky left-0 z-10 bg-brand-line min-w-[170px] sm:min-w-[200px]`}>
+                        Zawodnik
+                      </th>
+                      <th className={TH_CLASS}>Suma</th>
+                      {Array.from({ length: season.rounds }, (_, i) => (
+                        <th key={i} className={TH_CLASS}>
+                          Kolejka #{i + 1}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categoryPlayers.map((player) => {
+                      const points = getRoundPoints(player, season.rounds);
+                      const best = getBestRoundIndices(points, season.bestRounds);
+                      return (
+                        <tr
+                          key={player.name}
+                          className="group border-t border-brand-line hover:bg-brand-sky/40 transition-colors"
+                        >
+                          <td className={`${TD_CLASS} sticky left-0 z-10 bg-brand-cream group-hover:bg-[#e3f2ee] transition-colors`}>
+                            {player.place}. {player.name}
+                          </td>
+                          <td className={`${TD_CLASS} font-semibold`}>{player.totalPoints}</td>
+                          {points.map((pt, i) => (
+                            <td
+                              key={i}
+                              className={`${TD_CLASS} ${best.has(i) ? "font-semibold" : "text-brand-ink/60"}`}
+                            >
+                              {pt ?? "-"}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
 
-      <div className={`${CARD_CLASS} overflow-hidden`}>
-        <div className="overflow-x-auto">
-          <table className="min-w-[360px] sm:min-w-[640px] md:min-w-[700px] w-full text-[11px] sm:text-sm">
-            <thead>
-              <tr>
-                <th className={`${TH_CLASS}`}>Miejsce</th>
-                <th className={TH_CLASS}>Gracz</th>
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <th
-                    key={n}
-                    className={`${TH_CLASS} ${TD_CENTER} ${n >= 3 ? "hidden sm:table-cell" : ""}`}
-                  >
-                    #{n}
-                  </th>
-                ))}
-                {selectedSeason === "vol4" && (
-                  <th className={`${TH_CLASS} ${TD_CENTER} hidden sm:table-cell`}>
-                    #7
-                  </th>
-                )}
-                <th className={`${TH_CLASS} ${TD_CENTER}`}>Suma</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categoryPlayers.map((player, index) => {
-                const bestIndices = getBestRoundIndices(player, selectedSeason);
-                const isCounting = (n: number) => bestIndices.includes(n);
-                const placeBg = PLACE_COLORS[player.place];
-                const rowBg =
-                  placeBg ?? (index % 2 === 1 ? "bg-[#def0ef]/30" : "");
-                const points: (number | null | undefined)[] = [
-                  player.points1,
-                  player.points2,
-                  player.points3,
-                  player.points4,
-                  player.points5,
-                  player.points6,
-                ];
-                if (selectedSeason === "vol4") points.push(player.points7);
-
-                return (
-                  <tr
-                    key={player.name}
-                    className={`${rowBg} hover:bg-[#c1d8cf]/50 transition`}
-                    style={placeBg ? { backgroundColor: placeBg } : undefined}
-                  >
-                    <td className={`${TD_CLASS} font-semibold`}>
-                      {player.place}
-                    </td>
-                    <td className={`${TD_CLASS} font-semibold`}>
-                      {player.name}
-                    </td>
-                    {points.map((pt, i) => (
-                      <td
-                        key={i}
-                        className={`${TD_CLASS} ${TD_CENTER} ${i >= 2 ? "hidden sm:table-cell" : ""} ${isCounting(i + 1) ? "font-semibold" : "font-normal"}`}
-                      >
-                        {pt ?? "-"}
-                      </td>
-                    ))}
-                    <td
-                      className={`${TD_CLASS} ${TD_CENTER} font-semibold`}
-                    >
-                      {player.totalPoints}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/90">
+            <span>
+              Do sumy liczy się {season.bestRounds} najlepszych kolejek (pogrubione).
+            </span>
+            {overflowing && <span>Skroluj w bok, żeby zobaczyć całość wyników →</span>}
+          </div>
+        </>
+      )}
+    </PageShell>
   );
 };
 

@@ -19,7 +19,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   'http://localhost:3000';
 
-export const fetchCombinedResults = async (season: string = 'vol3'): Promise<{ [key: string]: CombinedResult[] }> => {
+export const fetchCombinedResults = async (season: string = 'vol5'): Promise<{ [key: string]: CombinedResult[] }> => {
   const endpoint = `results-crl-${season}`;
   const response = await axios.get(`${API_BASE_URL}/${endpoint}`);
   return response.data;
